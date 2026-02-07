@@ -238,7 +238,10 @@ class FileBrowserNode:
     @classmethod
     def INPUT_TYPES(cls):
         return {
-            "required": {},
+            "required": {
+                # Добавляем виджет 'path', чтобы JS мог записывать сюда текущий путь
+                "path": ("STRING", {"default": "", "multiline": False}),
+            },
             "optional": {
                 "trigger": ("*", {}),
             },
@@ -253,8 +256,20 @@ class FileBrowserNode:
     CATEGORY = "utils"
     OUTPUT_NODE = True
 
-    def execute(self, unique_id=None, **kwargs):
-        return ("", BASE_DIR,)
+    def execute(self, path="", unique_id=None, **kwargs):
+        # Если путь пустой, используем корень
+        rel_path = path if path else ""
+        
+        # Формируем полный абсолютный путь
+        full_path = os.path.abspath(os.path.join(BASE_DIR, rel_path))
+        
+        # Проверяем безопасность (чтобы не выйти за пределы папки ComfyUI, если это важно)
+        if not full_path.startswith(os.path.abspath(BASE_DIR)):
+             # Если путь выходит за пределы, возвращаем BASE_DIR во избежание ошибок
+            full_path = os.path.abspath(BASE_DIR)
+
+        # Возвращаем полный путь в оба выхода
+        return (full_path, full_path,)
 
 
 NODE_CLASS_MAPPINGS = {"FileBrowser": FileBrowserNode}

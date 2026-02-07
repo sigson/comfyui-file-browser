@@ -533,6 +533,16 @@ class FileBrowser {
                 this.currentPath = data.current_path || "";
                 this.entries = data.entries || [];
                 this.isRoot = data.is_root;
+
+                // ─── ДОБАВЛЕННЫЙ КОД НАЧАЛО ───
+                // Находим виджет 'path' в узле и обновляем его значение
+                if (this.node && this.node.widgets) {
+                    const pathWidget = this.node.widgets.find(w => w.name === "path");
+                    if (pathWidget) {
+                        pathWidget.value = this.currentPath;
+                    }
+                }
+                // ─── ДОБАВЛЕННЫЙ КОД КОНЕЦ ───
             }
         } catch (e) {
             this.error = "Connection error: " + e.message;
